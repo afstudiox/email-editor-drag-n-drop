@@ -1,35 +1,45 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+// client/src/App.jsx
+import { useState } from 'react';
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  // **Estrutura de Dados do Layout:**
+  // Cada objeto representa uma 'row' ou 'seção' do email.
+  // É crucial para o salvamento no backend.
+  const [emailLayout, setEmailLayout] = useState([
+    // Exemplo de como o estado inicial pode parecer.
+    // O id é importante para reordenação e manipulação.
+    { id: 'start-1', type: 'Text', content: 'Arraste componentes para cá!' },
+  ]);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="App">
+      <h1>Editor de Email Marketing (Drag-n-Drop)</h1>
+      <div className="editor-container">
+        {/* 1. Sidebar de Componentes (O que será arrastado) - FASE 6 */}
+        <div className="sidebar">
+          <h2>Blocos</h2>
+          {/* Aqui entrarão os componentes arrastáveis */}
+        </div>
+
+        {/* 2. Área de Edição (Canvas) - Onde será solto */}
+        <div className="canvas">
+          {emailLayout.map((item) => (
+            <div key={item.id} className={`layout-item ${item.type.toLowerCase()}`}>
+              {/* Renderização condicional dos seus Componentes React */}
+              <p>Bloco: {item.type} (ID: {item.id})</p>
+            </div>
+          ))}
+        </div>
+
+        {/* 3. Painel de Propriedades - FASE 2 */}
+        <div className="props-panel">
+          <h2>Configurações</h2>
+          <p>Selecione um bloco para editar.</p>
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    </div>
+  );
 }
 
-export default App
+export default App;
