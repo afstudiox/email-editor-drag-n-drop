@@ -1,5 +1,6 @@
 // client/src/App.jsx
 import { useState } from 'react';
+import EmailWrapper from './editor/Components/EmailsWrapper';
 import './App.css';
 
 function App() {
@@ -24,12 +25,14 @@ function App() {
 
         {/* 2. Área de Edição (Canvas) - Onde será solto */}
         <div className="canvas">
+          <EmailWrapper>
           {emailLayout.map((item) => (
             <div key={item.id} className={`layout-item ${item.type.toLowerCase()}`}>
               {/* Renderização condicional dos seus Componentes React */}
               <p>Bloco: {item.type} (ID: {item.id})</p>
             </div>
           ))}
+          </EmailWrapper>
         </div>
 
         {/* 3. Painel de Propriedades - FASE 2 */}
