@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
-import './index.css'
+
 
 // Importar o DndProvider e o HTML5Backend
 import { DndProvider } from 'react-dnd'
