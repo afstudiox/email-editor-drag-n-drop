@@ -6,8 +6,8 @@ import EmailWrapper from './editor/components/EmailWrapper';
 import EmailImage from './editor/components/EmailImage';
 
 // Importações da LÓGICA do editor
-import SidebarItem from './editor/SidebarItem'; 
-import { ItemTypes } from './editor/DragItemTypes'; // <-- CRÍTICO: Importação correta
+import Sidebar from './editor/SideBar';
+import { ItemTypes } from './editor/DragItemTypes'; 
 
 function App() {
   const [emailLayout, setEmailLayout] = useState([
@@ -72,11 +72,7 @@ function App() {
       <h1>Editor de Email Marketing (Drag-n-Drop)</h1>
       <div className="editor-container">
         {/* 1. Sidebar de Componentes */}
-        <div className="sidebar">
-          <h2>Blocos</h2>
-          {/* Renderiza o SidebarItem para o bloco de Imagem */}
-          <SidebarItem type="Image" name="Bloco de Imagem" />
-        </div>
+        <Sidebar />
 
         {/* 2. Área de Edição (Canvas) - Onde será solto */}
         <div 
