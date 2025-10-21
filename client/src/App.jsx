@@ -7,14 +7,16 @@ import EmailImage from './editor/components/EmailImage';
 
 // Importações da LÓGICA do editor
 import Sidebar from './editor/SideBar';
+import PropsPanel from './editor/PropsPanel';
 import { ItemTypes } from './editor/DragItemTypes'; 
 
 function App() {
-  const [emailLayout, setEmailLayout] = useState([
-    // Bloco inicial (imagem da Hyundai)
-    { id: 'img-1', type: 'Image', src: 'https://placehold.co/200x20/orange/white', styles: {} },
-  ]);
+  
+  // Gerenciamento de estados
+  const [emailLayout, setEmailLayout] = useState([]);
+  const [selectedBlockId, setSelectedBlockId] = useState(null);
 
+  // Função para gerar IDs únicos
   const generateUniqueId = (type) => `${type.toLowerCase()}-${Date.now()}`;
 
   // 1. Função de manipulação do Drop
@@ -57,6 +59,11 @@ function App() {
     }),
   }), [emailLayout]);
 
+  // 3. Define qual bloco está selecionado
+  const handleSelectedBlock = (id) => {
+    setSelectedBlockId(id);
+  };
+
   // Lógica de Renderização Condicional
   const renderComponent = (item) => {
     switch (item.type) {
@@ -87,7 +94,16 @@ function App() {
         >
           <EmailWrapper>
             {emailLayout.map((item) => (
-              <div key={item.id} className="layout-item">
+              <div 
+                key={item.id} 
+                className="layout-item"
+                onClick={() => handleSelectedBlock(item.id)}
+                style={{ 
+                  outline: item.id === selectedBlockId ? '2px solid #646cff' : 'none', 
+                  cursor: 'pointer',
+                  position: 'relative',
+                  margin: '10px 0'
+                }}>
                 {renderComponent(item)}
               </div>
             ))}
@@ -95,10 +111,11 @@ function App() {
         </div>
 
         {/* 3. Painel de Propriedades */}
-        <div className="props-panel">
-          <h2>Configurações</h2>
-          <p>Selecione um bloco para editar.</p>
-        </div>
+        <PropsPanel 
+          selectedBlockId={selectedBlockId} 
+          emailLayout={emailLayout}   
+          onUpdateBlock={() => {}} // Lógica de atualização será implementada depois
+        />
       </div>
     </div>
   );
