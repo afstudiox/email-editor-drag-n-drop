@@ -1,89 +1,87 @@
-import { useState } from 'react';
 import { useDrop } from 'react-dnd';
+import React from 'react';
 
-// Importações dos componentes
-import EmailWrapper from './editor/components/EmailWrapper';
-import EmailImage from './editor/components/EmailImage';
+// Importa o Contexto e o Hook do Editor (Extensões removidas)
+import { useEditor, EditorProvider } from './editor/EditorContext'; 
 
-// Importações da LÓGICA do editor
-import Sidebar from './editor/SideBar';
-import PropsPanel from './editor/PropsPanel';
+// Importações dos componentes (Extensões removidas)
+import EmailWrapper from './editor/components/EmailWrapper'; 
+import EmailImage from './editor/components/EmailImage'; 
+
+// Importações dos componentes de UI (Extensões removidas)
+import Sidebar from './editor/SideBar'; 
+import PropsPanel from './editor/PropsPanel'; 
 import { ItemTypes } from './editor/DragItemTypes'; 
 
-function App() {
-  
-  // Gerenciamento de estados
-  const [emailLayout, setEmailLayout] = useState([]);
-  const [selectedBlockId, setSelectedBlockId] = useState(null);
+// =================================================================
+// Componentes Auxiliares
+// =================================================================
 
-  // Função para gerar IDs únicos
-  const generateUniqueId = (type) => `${type.toLowerCase()}-${Date.now()}`;
+/**
+ * Responsável por envolver o componente de e-mail (ex: EmailImage) com a 
+ * lógica de seleção e a borda azul.
+ */
+const BlockRenderer = ({ item }) => {
+  // Acessa o estado e a função de seleção globalmente
+  const { handleSelectedBlock, selectedBlockId } = useEditor();
 
-  // 1. Função de manipulação do Drop
-  const handleDrop = (item) => {
-    const blockType = item.type;
-    
-    let newItem;
-    const newId = generateUniqueId(blockType);
-
-    switch (blockType) {
+  const renderComponent = (block) => {
+    switch (block.type) {
         case 'Image':
-            newItem = { 
-                id: newId, 
-                type: 'Image', 
-                src: 'https://placehold.co/200x20/orange/white', 
-                alt: newId,
-                styles: {} 
-            };
-            break;
-        // Adicionaremos 'Text' aqui depois
+            // Renderiza o componente de e-mail passando as propriedades do bloco
+            return <EmailImage src={block.src} alt={block.alt} />;
         default:
-            return;
+            return <p>Componente: {block.type}. Aguardando criação!</p>; 
     }
-
-    // Adiciona o novo item ao final do layout
-    setEmailLayout(prevLayout => [...prevLayout, newItem]);
   };
 
-  // 2. Configura o useDrop para o Canvas
+  return (
+    <div 
+      key={item.id} 
+      className="layout-item"
+      onClick={() => handleSelectedBlock(item.id)}
+      style={{ 
+        outline: item.id === selectedBlockId ? '2px solid #646cff' : 'none', 
+        cursor: 'pointer',
+        position: 'relative',
+        margin: '10px 0'
+      }}>
+      {renderComponent(item)}
+    </div>
+  )
+}
+
+
+// =================================================================
+// Componente Principal de Layout (UI)
+// Este componente é o responsável por montar a interface.
+// =================================================================
+const EditorUI = () => {
+  
+  // Puxa apenas os dados e funções necessários do Contexto
+  const { emailLayout, handleDrop } = useEditor(); 
+
+  // 1. Configura o useDrop para o Canvas
   const [{ isOver }, drop] = useDrop(() => ({
-    // ACEITA O TIPO DE INTERAÇÃO: CONTENT_BLOCK
     accept: [ItemTypes.CONTENT_BLOCK], 
-    
-    // CORREÇÃO LINTER: Usamos _monitor para evitar o aviso
     drop: (item, _monitor) => { 
       handleDrop(item);
     },
     collect: (monitor) => ({
       isOver: !!monitor.isOver(),
     }),
-  }), [emailLayout]);
-
-  // 3. Define qual bloco está selecionado
-  const handleSelectedBlock = (id) => {
-    setSelectedBlockId(id);
-  };
-
-  // Lógica de Renderização Condicional
-  const renderComponent = (item) => {
-    switch (item.type) {
-        case 'Image':
-            return <EmailImage src={item.src} alt={item.alt} {...item.styles} />;
-        default:
-            return <p>Componente: {item.type}. Aguardando criação!</p>; 
-    }
-  };
+  }), [handleDrop]); 
 
   return (
     <div className="App">
       <h1>Editor de Email Marketing (Drag-n-Drop)</h1>
       <div className="editor-container">
-        {/* 1. Sidebar de Componentes */}
+        {/* 1. Sidebar (Componente de UI) */}
         <Sidebar />
 
         {/* 2. Área de Edição (Canvas) - Onde será solto */}
         <div 
-            ref={drop} // Conecta o alvo de soltura (drop)
+            ref={drop} 
             className="canvas"
             style={{ 
                 border: isOver ? '3px dashed #646cff' : '3px dashed transparent',
@@ -94,30 +92,29 @@ function App() {
         >
           <EmailWrapper>
             {emailLayout.map((item) => (
-              <div 
-                key={item.id} 
-                className="layout-item"
-                onClick={() => handleSelectedBlock(item.id)}
-                style={{ 
-                  outline: item.id === selectedBlockId ? '2px solid #646cff' : 'none', 
-                  cursor: 'pointer',
-                  position: 'relative',
-                  margin: '10px 0'
-                }}>
-                {renderComponent(item)}
-              </div>
+              // BlockRenderer cuida da seleção e renderiza o bloco específico
+              <BlockRenderer key={item.id} item={item} />
             ))}
           </EmailWrapper>
         </div>
 
-        {/* 3. Painel de Propriedades */}
-        <PropsPanel 
-          selectedBlockId={selectedBlockId} 
-          emailLayout={emailLayout}   
-          onUpdateBlock={() => {}} // Lógica de atualização será implementada depois
-        />
+        {/* 3. Painel de Propriedades (Componente de UI) */}
+        <PropsPanel /> 
       </div>
     </div>
+  );
+}
+
+// =================================================================
+// Componente App (Wrapper de Provedor)
+// Onde o Contexto do Editor é fornecido à UI.
+// =================================================================
+function App() {
+  // Apenas envolve a UI com o Provedor de Contexto (DndProvider está no main.jsx)
+  return (
+    <EditorProvider>
+      <EditorUI />
+    </EditorProvider>
   );
 }
 

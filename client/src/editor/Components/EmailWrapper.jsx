@@ -1,23 +1,18 @@
 import React from "react";
 
-// O Wrapper não aceitará props inicialmente, ele é a estrutura rígida.
+/**
+ * Componente Wrapper que define a estrutura de tabela mestra (600px) do e-mail.
+ * Ele recebe e renderiza todos os blocos de conteúdo como children.
+ */
 const EmailWrapper = ({ children }) => {
-    // 1. O código Ampscript/Tracking do SFMC deve ser renderizado como texto puro.
-    // Usamos um template literal para facilitar a leitura.
-    const sfmcBoilerplate = `
-%%[ set @fullName = AttributeValue("FirstName") if indexOf(@fullName, " ") > 0 then set @firstName = Substring(@fullName,1, Subtract(IndexOf(@fullName," "),1)) elseif indexOf(@fullName, ";") > 0 then set @firstName = Substring(@fullName, Add(IndexOf(@fullName, ";"), 2), Length(@fullName)) else set @firstName = AttributeValue("FirstName") endif ]%%
-<custom name="opencounter" type="tracking"/>
-`;
+    
 
-    // 2. Este componente gera o <body> (a parte editável)
+
+    // 1. Este componente gera o <body> (a parte editável do e-mail)
     return (
+        // Usamos um Fragmento (<>) pois o wrapper será renderizado dentro do canvas principal.
         <>
-            {/* Usamos dangerouslySetInnerHTML para renderizar o Ampscript e HTML de rastreamento 
-              como strings puras, sem que o React tente interpretá-los como JSX.
-            */}
-            <div dangerouslySetInnerHTML={{ __html: sfmcBoilerplate }} />
-
-            {/* A Tabela Mestrar de 600px */}
+            {/* A Tabela Mestra de 600px, centrada e com largura total para clientes de e-mail */}
             <table
                 width="600"
                 cellSpacing="0"
@@ -25,13 +20,18 @@ const EmailWrapper = ({ children }) => {
                 role="presentation"
                 align="center"
                 border="0"
-                // Removido style={{ margin: 'auto !important', padding: 'auto !important' }} 
-                // para evitar conflitos no React e confiar no atributo align="center"
+                style={{
+                    // Propriedades essenciais para responsividade em clientes de e-mail
+                    maxWidth: '600px',
+                    width: '100%', 
+                    margin: '0 auto', 
+                    backgroundColor: '#ffffff' // Fundo padrão para o Canvas
+                }}
             >
                 <tbody>
                     <tr>
-                        <td>
-                            {/* Aqui, o React renderizará todos os blocos arrastados pelo usuário */}
+                        <td align="center">
+                            {/* Aqui, o React renderizará todos os blocos arrastados pelo usuário (children) */}
                             {children}
                             
                             {/* Os blocos fixos (VIEW EXTERNAL LINK, FOOTER, etc.) serão adicionados aqui no futuro */}
